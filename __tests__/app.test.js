@@ -1,8 +1,8 @@
 const endpointsJson = require("../endpoints.json");
-const seed = require("../db/seeds/seed");
-const db = require("../db/connection");
-const app = require("../app");
 const request = require("supertest");
+const db = require("../db/connection");
+const seed = require("../db/seeds/seed");
+const app = require("../app");
 const testData = require("../db/data/test-data");
 
 /* Set up your test imports here */
@@ -39,6 +39,45 @@ describe("GET/api/topics", () => {
             slug: expect.any(String),
           });
         });
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id", () => {
+  test("200: sends an article with a specific requested id", () => {
+    return request(app)
+      .get("/api/articles/5")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          article_id: 5,
+          title: "UNCOVERED: catspiracy to bring down democracy",
+          topic: "cats",
+          author: "rogersop",
+          body: "Bastet walks amongst us, and the cats are taking arms!",
+          created_at: "2020-08-03T13:14:00.000Z",
+          votes: 0,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+
+  test("404: Error message of non existing ID", () => {
+    return request(app)
+      .get("/api/articles/999")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+
+  test("400: Error message of an invalid ID", () => {
+    return request(app)
+      .get("/api/articles/notid")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
       });
   });
 });
