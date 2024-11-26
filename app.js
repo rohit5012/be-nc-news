@@ -15,8 +15,9 @@ const { getTopics } = require("./controllers/topics.controller");
 const {
   getArticles,
   getArticleByID,
-  getArticleComments,
 } = require("./controllers/articles.controller");
+
+const { getArticleComments } = require("./controllers/comments.controller");
 
 app.get("/api", getApi);
 

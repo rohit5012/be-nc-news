@@ -125,3 +125,58 @@ describe("GET /api/articles", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article/comments", () => {
+  test("200: sends all the comments of specific article", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toEqual([
+          {
+            comment_id: 15,
+            body: "I am 100% sure that we're not completely sure.",
+            votes: 1,
+            author: "butter_bridge",
+            article_id: 5,
+            created_at: "2020-11-24T00:08:00.000Z",
+          },
+          {
+            comment_id: 14,
+            body: "What do you see? I have no idea where this will lead us. This place I speak of, is known as the Black Lodge.",
+            votes: 16,
+            author: "icellusedkars",
+            article_id: 5,
+            created_at: "2020-06-09T05:00:00.000Z",
+          },
+        ]);
+      });
+  });
+
+  test("200: return an array in descending order by date created", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("400: send an error when article id is invalid", () => {
+    return request(app)
+      .get("/api/articles/NotID/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  test("404:sends an error when article ID doesn''t exist in the database", () => {
+    return request(app)
+      .get("/api/articles/555/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+});
