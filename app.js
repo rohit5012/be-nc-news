@@ -15,6 +15,7 @@ const { getTopics } = require("./controllers/topics.controller");
 const {
   getArticles,
   getArticleByID,
+  getArticleComments,
 } = require("./controllers/articles.controller");
 
 app.get("/api", getApi);
@@ -24,6 +25,8 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getArticleByID);
+
+app.get("/api/articles/:article_id/comments", getArticleComments);
 
 app.use(handleCustomErrors);
 app.use(handlePostgreErrors);
