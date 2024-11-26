@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const app = require("../app");
 const testData = require("../db/data/test-data");
+require("jest-sorted");
 
 /* Set up your test imports here */
 beforeEach(() => {
@@ -78,6 +79,49 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad Request");
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("200: sends an array of all the articles in the database", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("200: sends an array of articles in descending date order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("200: sends an articles do not contain body property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        articles.forEach((article) => {
+          expect(article).not.toHaveProperty("body");
+        });
       });
   });
 });
