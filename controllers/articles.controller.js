@@ -1,8 +1,4 @@
-const {
-  articleByID,
-  getAllArticles,
-  articleComments,
-} = require("../models/article.model");
+const { articleByID, getAllArticles } = require("../models/article.model");
 
 exports.getArticles = (req, res, next) => {
   getAllArticles()
@@ -23,11 +19,4 @@ exports.getArticleByID = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
-};
-
-exports.getArticleComments = (req, res, next) => {
-  const { article_id } = req.params;
-  articleComments(article_id).then((comments) => {
-    console.log(comments);
-  });
 };
