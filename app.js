@@ -6,16 +6,22 @@ const {
   handlePostgreErrors,
 } = require("./errors/index");
 
+app.use(express.json());
+
 const { getApi } = require("./controllers/api.controller");
 
 const { getTopics } = require("./controllers/topics.controller");
+
+const { getArticleByID } = require("./controllers/articles.controller");
 
 app.get("/api", getApi);
 
 app.get("/api/topics", getTopics);
 
+app.get("/api/articles/:article_id", getArticleByID);
+
 app.use(handleCustomErrors);
-app.use(handleServerErrors);
 app.use(handlePostgreErrors);
+app.use(handleServerErrors);
 
 module.exports = app;
