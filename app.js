@@ -21,6 +21,7 @@ const {
 const {
   getArticleComments,
   postComments,
+  deleteComment,
 } = require("./controllers/comments.controller");
 
 app.get("/api", getApi);
@@ -36,6 +37,8 @@ app.get("/api/articles/:article_id/comments", getArticleComments);
 app.post("/api/articles/:article_id/comments", postComments);
 
 app.patch("/api/articles/:article_id", articleUpdated);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.use(handleCustomErrors);
 app.use(handlePostgreErrors);

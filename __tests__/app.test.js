@@ -340,3 +340,32 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: comment deleted of specific comment id", () => {
+    return request(app)
+      .delete("/api/comments/5")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({});
+      });
+  });
+
+  test("404: sends an error if given a non-existing comment_id", () => {
+    return request(app)
+      .delete("/api/comments/555")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+
+  test("400: sends an error if given an invalid comment_id", () => {
+    return request(app)
+      .delete("/api/comments/NotID")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+});

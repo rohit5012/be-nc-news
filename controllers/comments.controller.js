@@ -1,5 +1,9 @@
 const { checkArticleExists } = require("../models/article.model");
-const { articleComments, postComments } = require("../models/comment.model");
+const {
+  articleComments,
+  postComments,
+  commentDeleted,
+} = require("../models/comment.model");
 
 exports.getArticleComments = (req, res, next) => {
   const { article_id } = req.params;
@@ -28,6 +32,15 @@ exports.postComments = (req, res, next) => {
   Promise.all(promise)
     .then(([article, comment]) => {
       res.status(201).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.deleteComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  commentDeleted(comment_id)
+    .then(() => {
+      res.status(204).send();
     })
     .catch(next);
 };
