@@ -278,3 +278,65 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Message of a updated article for a specific article_id if given positive integer", () => {
+    return request(app)
+      .patch("/api/articles/5")
+      .send({ inc_votes: 20 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(20);
+      });
+  });
+
+  test("200: Message of a updated article for a specific article if given negative integer", () => {
+    return request(app)
+      .patch("/api/articles/5")
+      .send({ inc_votes: -20 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(-20);
+      });
+  });
+
+  test("400: sends an error if not given a valid number", () => {
+    return request(app)
+      .patch("/api/articles/5")
+      .send({ inc_votes: "not a number" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  test("400: sends an error if given an empty object", () => {
+    return request(app)
+      .patch("/api/articles/5")
+      .send({ inc_votes: {} })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  test("400: sends an error if given an invalid article_id", () => {
+    return request(app)
+      .patch("/api/articles/NotID")
+      .send({ inc_votes: 20 })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  test("404: sends an error if given a non-existing article_id", () => {
+    return request(app)
+      .patch("/api/articles/555")
+      .send({ inc_votes: 20 })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+});

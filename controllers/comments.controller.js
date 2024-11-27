@@ -18,10 +18,13 @@ exports.getArticleComments = (req, res, next) => {
 exports.postComments = (req, res, next) => {
   const { username, body } = req.body;
   const { article_id } = req.params;
+
   const checkArticleID = checkArticleExists(article_id);
+
   const postComment = postComments(username, body, article_id);
 
   const promise = [checkArticleID, postComment];
+
   Promise.all(promise)
     .then(([article, comment]) => {
       res.status(201).send({ comment });
