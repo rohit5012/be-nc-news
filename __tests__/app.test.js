@@ -180,3 +180,101 @@ describe("GET /api/articles/:article/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: Message of a posted comment for a specific article", () => {
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send({
+        username: "butter_bridge",
+        body: "New comment",
+      })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          body: "New comment",
+          created_at: expect.any(String),
+          votes: 0,
+          author: "butter_bridge",
+          article_id: 5,
+        });
+      });
+  });
+
+  test("400: sends an error if comment posted without a username", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        body: "New comment",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("please add username");
+      });
+  });
+
+  test("400: sends an error if comment posted without a body", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        username: "butter_bridge",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("please add body");
+      });
+  });
+
+  test("400: send an error when article id is invalid", () => {
+    return request(app)
+      .post("/api/articles/NotID/comments")
+      .send({
+        username: "butter_bridge",
+        body: "New comment",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  test("404:sends an error when article ID doesn''t exist in the database", () => {
+    return request(app)
+      .post("/api/articles/555/comments")
+      .send({
+        username: "butter_bridge",
+        body: "New comment",
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+
+  test("400: sends an error if body provided is not a string", () => {
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send({
+        username: "butter_bridge",
+        body: 999,
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  test("400: sends an error if body and username both are empty", () => {
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send({
+        username: {},
+        body: {},
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+});
