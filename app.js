@@ -6,7 +6,7 @@ const {
   handlePostgreErrors,
 } = require("./errors/index");
 
-// app.use(express.json());
+app.use(express.json());
 
 const { getApi } = require("./controllers/api.controller");
 
@@ -17,7 +17,10 @@ const {
   getArticleByID,
 } = require("./controllers/articles.controller");
 
-const { getArticleComments } = require("./controllers/comments.controller");
+const {
+  getArticleComments,
+  postComments,
+} = require("./controllers/comments.controller");
 
 app.get("/api", getApi);
 
@@ -28,6 +31,8 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleByID);
 
 app.get("/api/articles/:article_id/comments", getArticleComments);
+
+app.post("/api/articles/:article_id/comments", postComments);
 
 app.use(handleCustomErrors);
 app.use(handlePostgreErrors);
