@@ -24,9 +24,13 @@ const {
   deleteComment,
 } = require("./controllers/comments.controller");
 
+const { getUsers } = require("./controllers/users.controller");
+
 app.get("/api", getApi);
 
 app.get("/api/topics", getTopics);
+
+app.get("/api/users", getUsers);
 
 app.get("/api/articles", getArticles);
 
