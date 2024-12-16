@@ -44,6 +44,115 @@ describe("GET/api/topics", () => {
   });
 });
 
+describe("GET/api/articles", () => {
+  test("200: sends an array of all the articles in the database", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("200: sends an array of articles in descending date order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("200: sends articles do not contain body property", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        articles.forEach((article) => {
+          expect(article).not.toHaveProperty("body");
+        });
+      });
+  });
+
+  test("200: send articles by descending order by author name", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("author", { descending: true });
+      });
+  });
+
+  test("200: send articles with both sort_by and order queries", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=ASC")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("title", { descending: false });
+      });
+  });
+
+  test("200: Return articles by the given topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(12);
+        articles.forEach(({ topic }) => {
+          expect(topic).toBe("cats");
+        });
+      });
+  });
+
+  test("200: return with no articles for that topic query", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toEqual([]);
+      });
+  });
+
+  test("400: Return error msg if non-valid sort_by query entered", () => {
+    return request(app)
+      .get("/api/articles?sort_by=NonValidCode")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+
+  test("400: Return error msg if non-valid order query entered", () => {
+    return request(app)
+      .get("/api/articles?order=NonValidCode")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+
+  test("404: Return error message if given a topic that doesn''t exist in the database", () => {
+    return request(app)
+      .get("/api/articles?topic=NonExistTopic")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not found");
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id", () => {
   test("200: sends an article with a specific requested id", () => {
     return request(app)
@@ -79,49 +188,6 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad Request");
-      });
-  });
-});
-
-describe("GET /api/articles", () => {
-  test("200: sends an array of all the articles in the database", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
-        articles.forEach((article) => {
-          expect(article).toMatchObject({
-            author: expect.any(String),
-            title: expect.any(String),
-            article_id: expect.any(Number),
-            topic: expect.any(String),
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-            article_img_url: expect.any(String),
-            comment_count: expect.any(Number),
-          });
-        });
-      });
-  });
-  test("200: sends an array of articles in descending date order", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy("created_at", { descending: true });
-      });
-  });
-
-  test("200: sends an articles do not contain body property", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
-        articles.forEach((article) => {
-          expect(article).not.toHaveProperty("body");
-        });
       });
   });
 });
