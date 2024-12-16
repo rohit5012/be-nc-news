@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const {
   handleCustomErrors,
@@ -6,6 +7,7 @@ const {
   handlePostgreErrors,
 } = require("./errors/index");
 
+app.use(cors());
 app.use(express.json());
 
 const { getApi } = require("./controllers/api.controller");
