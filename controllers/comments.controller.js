@@ -2,6 +2,7 @@ const { checkArticleExists } = require("../models/article.model");
 const {
   articleComments,
   postComments,
+  patchComment,
   commentDeleted,
 } = require("../models/comment.model");
 
@@ -32,6 +33,17 @@ exports.postComments = (req, res, next) => {
   Promise.all(promise)
     .then(([article, comment]) => {
       res.status(201).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.updateCommentByID = (req, res, next) => {
+  const updatedVotes = req.body.inc_votes;
+  const { comment_id } = req.params;
+
+  patchComment(updatedVotes, comment_id)
+    .then((updatedComment) => {
+      res.status(200).send({ updatedComment });
     })
     .catch(next);
 };
